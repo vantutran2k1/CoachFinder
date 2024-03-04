@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:12-alpine
+    restart: on-failure
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=coach_finder
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+volumes:
+  db:
+    driver: local
