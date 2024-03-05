@@ -21,6 +21,11 @@
       <input type="number" id="rate" v-model.number="rate.val" @blur="clearValidity('rate')">
       <p v-if="!rate.isValid">Rate must be greater than 0</p>
     </div>
+    <div class="form-control" :class="{invalid: !email.isValid}">
+      <label for="rate">Email</label>
+      <input type="email" id="rate" v-model.trim="email.val" @blur="clearValidity('email')">
+      <p v-if="!email.isValid">Email must not be empty</p>
+    </div>
     <div class="form-control" :class="{invalid: !areas.isValid}">
       <h3>Areas of Expertise</h3>
       <div>
@@ -66,6 +71,10 @@ export default {
         val: null,
         isValid: true
       },
+      email: {
+        val: '',
+        isValid: true
+      },
       areas: {
         val: [],
         isValid: true
@@ -96,6 +105,10 @@ export default {
         this.rate.isValid = false;
         this.formIsValid = false;
       }
+      if (this.email.val === '' || !this.email.val.includes('@')) {
+        this.email.isValid = false;
+        this.formIsValid = false;
+      }
       if (this.areas.val.length === 0) {
         this.areas.isValid = false;
         this.formIsValid = false;
@@ -113,6 +126,7 @@ export default {
         last: this.lastName.val,
         desc: this.description.val,
         rate: this.rate.val,
+        email: this.email.val,
         areas: this.areas.val
       };
       this.$emit('save-data', formData);
