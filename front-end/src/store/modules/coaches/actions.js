@@ -16,10 +16,29 @@ export default {
 			},
 			body: JSON.stringify(coachData)
 		});
-		// if (!response.ok) {
-		//
-		// }
+	},
+	async loadCoaches(context) {
+		const coaches = [];
 		
-		context.commit('registerCoach', coachData);
+		const response = await fetch('http://127.0.0.1:5000/coaches');
+		const responseData = await response.json();
+		if ('data' in responseData) {
+			console.log(responseData['data'].length);
+			for (const coachData of responseData['data']) {
+				const coach = {
+					id: coachData.id,
+					firstName: coachData.first_name,
+					lastName: coachData.last_name,
+					description: coachData.description,
+					hourlyRate: coachData.hourly_rate,
+					email: coachData.email,
+					areas: coachData.areas
+				};
+				
+				coaches.push(coach);
+			}
+		}
+		
+		context.commit('setCoaches', coaches);
 	}
 };
