@@ -87,14 +87,19 @@ def create_coach():
     return ApiResponse.get_response(new_coach.to_json(), http.HTTPStatus.CREATED)
 
 
-@app.route('/requests', methods=['GET'])
+@app.route("/requests", methods=["GET"])
 def get_requests():
-    requests = Request.query.all()
+    coach_id = request.args.get("coach_id")
+    if coach_id is None:
+        requests = Request.query.all()
+    else:
+        requests = Request.query.filter_by(coach_id=coach_id).all()
+
     json_requests = list(map(lambda contact_request: contact_request.to_json(), requests))
     return ApiResponse.get_response(json_requests, http.HTTPStatus.OK)
 
 
-@app.route('/requests/<request_id>', methods=['GET'])
+@app.route("/requests/<request_id>", methods=["GET"])
 def get_request(request_id):
     try:
         request_id = int(request_id)
