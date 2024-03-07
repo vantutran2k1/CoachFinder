@@ -28,7 +28,6 @@ export default {
 		}
 		
 		if ('data' in responseData) {
-			console.log(responseData['data'].length);
 			for (const coachData of responseData['data']) {
 				const coach = {
 					id: coachData.id,

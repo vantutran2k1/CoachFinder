@@ -53,7 +53,8 @@ export default {
     }
   },
   created() {
-    this.selectedCoach = this.$store.getters['coaches/coaches'].find(coach => coach.id === this.id);
+    const coaches = JSON.parse(JSON.stringify(this.$store.getters['coaches/coaches']));
+    this.selectedCoach = coaches.find(coach => coach.id === Number(this.id));
   }
 };
 
