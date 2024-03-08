@@ -17,7 +17,11 @@ export default {
 			body: JSON.stringify(coachData)
 		});
 	},
-	async loadCoaches(context) {
+	async loadCoaches(context, payload) {
+		if (!payload.forceRefresh && !context.getters.shouldUpdate) {
+			return;
+		}
+		
 		const coaches = [];
 		
 		const response = await fetch('http://127.0.0.1:5000/coaches');
@@ -44,5 +48,6 @@ export default {
 		}
 		
 		context.commit('setCoaches', coaches);
+		context.commit('setFetchTimestamp');
 	}
 };
