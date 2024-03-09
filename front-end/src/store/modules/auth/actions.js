@@ -15,7 +15,7 @@ export default {
 		const responseData = await response.json();
 		
 		if (!response.ok) {
-			throw new Error(responseData.message || 'Failed to signup!');
+			throw new Error(responseData['error'] || 'Failed to signup!');
 		}
 		
 		if ('data' in responseData) {
