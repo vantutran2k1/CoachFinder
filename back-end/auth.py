@@ -1,10 +1,13 @@
 import http
 import re
+from datetime import datetime
 
 from flask import Blueprint, request
+from flask_jwt_extended import create_access_token
 from werkzeug.security import generate_password_hash
 
 from api_response import ApiResponse
+from config import app
 from models import User, db
 
 auth = Blueprint("auth", __name__)
@@ -48,4 +51,9 @@ def signup():
     except Exception as e:
         return ApiResponse.get_error_response(str(e), http.HTTPStatus.INTERNAL_SERVER_ERROR)
 
-    return ApiResponse.get_response(new_user.to_json(), http.HTTPStatus.CREATED)
+    response = new_user.to_json()
+    response["access_token"] = create_access_token(identity=new_user.email)
+    response["expiration_time"] = (datetime.now() + app.config["JWT_ACCESS_TOKEN_EXPIRES"]).strftime(
+        "%Y-%m-%d %H:%M:%S")
+
+    return ApiResponse.get_response(response, http.HTTPStatus.CREATED)
