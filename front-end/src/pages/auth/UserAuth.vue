@@ -20,6 +20,9 @@
 import BaseButton from '@/components/ui/BaseButton.vue';
 import BaseCard from '@/components/ui/BaseCard.vue';
 
+const LOGIN = 'login';
+const SIGN_UP = 'signup';
+
 export default {
   components: {BaseButton, BaseCard},
   data() {
@@ -27,19 +30,19 @@ export default {
       email: '',
       password: '',
       formIsValid: true,
-      mode: 'login'
+      mode: LOGIN
     };
   },
   computed: {
     submitButtonCaption() {
-      if (this.mode === 'login') {
+      if (this.mode === LOGIN) {
         return 'Login';
       } else {
         return 'Signup';
       }
     },
     switchModeButtonCaption() {
-      if (this.mode === 'login') {
+      if (this.mode === LOGIN) {
         return 'Signup instead';
       } else {
         return 'Login instead';
@@ -54,12 +57,21 @@ export default {
         this.formIsValid = false;
         return;
       }
+
+      if (this.mode === LOGIN) {
+        //   
+      } else {
+        this.$store.dispatch('signup', {
+          email: this.email,
+          password: this.password
+        });
+      }
     },
     switchAuthMode() {
-      if (this.mode === 'login') {
-        this.mode = 'signup';
+      if (this.mode === LOGIN) {
+        this.mode = SIGN_UP;
       } else {
-        this.mode = 'login';
+        this.mode = LOGIN;
       }
     }
   }
