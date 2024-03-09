@@ -44,3 +44,17 @@ class Request(db.Model):
             "user_email": self.user_email,
             "message": self.message
         }
+
+
+class User(db.Model):
+    __tablename__ = "users"
+
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.Text, unique=False, nullable=False)
+
+    def to_json(self):
+        return {
+            "id": self.id,
+            "email": self.email
+        }

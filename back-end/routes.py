@@ -5,7 +5,7 @@ from flask import request, Blueprint
 from api_response import ApiResponse
 from models import Coach, db, Request
 
-routes = Blueprint('routes', __name__)
+routes = Blueprint("routes", __name__)
 
 
 @routes.route("/coaches", methods=["GET"])

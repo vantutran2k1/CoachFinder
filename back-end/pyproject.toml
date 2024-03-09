@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "back-end"
+version = "0.1.0"
+description = ""
+authors = ["vantutran2k1 <vantu.tran2k1@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+flask = "^3.0.2"
+flask-cors = "^4.0.0"
+flask-migrate = "^4.0.5"
+flask-login = "^0.6.3"
+psycopg2-binary = "^2.9.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
