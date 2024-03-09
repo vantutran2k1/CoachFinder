@@ -3,8 +3,8 @@ import re
 from datetime import datetime
 
 from flask import Blueprint, request
-from flask_jwt_extended import create_access_token
-from werkzeug.security import generate_password_hash
+from flask_jwt_extended import create_access_token, create_refresh_token
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from api_response import ApiResponse
 from config import app
@@ -53,7 +53,41 @@ def signup():
 
     response = new_user.to_json()
     response["access_token"] = create_access_token(identity=new_user.email)
-    response["expiration_time"] = (datetime.now() + app.config["JWT_ACCESS_TOKEN_EXPIRES"]).strftime(
-        "%Y-%m-%d %H:%M:%S")
+    response["expiration_time"] = _get_access_token_expiration()
 
     return ApiResponse.get_response(response, http.HTTPStatus.CREATED)
+
+
+@auth.route("/login", methods=["POST"])
+def login():
+    email = request.json.get("email")
+    password = request.json.get("password")
+
+    if not all([email, password]):
+        return ApiResponse.get_error_response(
+            "Please provide all required fields: email, password",
+            http.HTTPStatus.BAD_REQUEST
+        )
+
+    user = User.query.filter_by(email=email).first()
+    if user is None or not check_password_hash(user.password, password):
+        return ApiResponse.get_error_response(
+            "Invalid email or password. Check your login details and try again",
+            http.HTTPStatus.UNAUTHORIZED
+        )
+
+    access_token = create_access_token(identity=user.email)
+    refresh_token = create_refresh_token(identity=user.email)
+
+    return ApiResponse.get_response(
+        {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "expiration_time": _get_access_token_expiration()
+        },
+        http.HTTPStatus.OK
+    )
+
+
+def _get_access_token_expiration():
+    return (datetime.now() + app.config["JWT_ACCESS_TOKEN_EXPIRES"]).strftime("%Y-%m-%d %H:%M:%S")
