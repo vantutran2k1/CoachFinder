@@ -2,14 +2,14 @@ export default {
 	async contactCoach(context, payload) {
 		const newRequest = {
 			coach_id: payload.coachId,
-			user_email: payload.email,
 			message: payload.message
 		};
 		
 		const response = await fetch('http://127.0.0.1:5000/requests', {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${context.rootGetters.accessToken}`
 			},
 			body: JSON.stringify(newRequest)
 		});
@@ -22,8 +22,17 @@ export default {
 		context.commit('addRequest', newRequest);
 	},
 	async fetchRequests(context) {
-		const coachId = context.rootGetters.userId;
-		const response = await fetch(`http://127.0.0.1:5000/requests?coach_id=${coachId}`);
+		const accessToken = context.rootGetters.accessToken;
+		if (accessToken === null) {
+			return;
+		}
+		
+		const response = await fetch('http://127.0.0.1:5000/requests', {
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${accessToken}`
+			},
+		});
 		const responseData = await response.json();
 		
 		if (!response.ok) {

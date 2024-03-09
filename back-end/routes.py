@@ -1,6 +1,7 @@
 import http
 
 from flask import request, Blueprint
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from api_response import ApiResponse
 from models import Coach, db, Request
@@ -34,20 +35,21 @@ def get_coach(coach_id):
 
 
 @routes.route("/coaches", methods=["POST"])
+@jwt_required()
 def create_coach():
     first_name = request.json.get("first_name")
     last_name = request.json.get("last_name")
     description = request.json.get("description")
     hourly_rate = request.json.get("hourly_rate")
-    email = request.json.get("email")
     areas = request.json.get("areas")
 
-    if not all([first_name, last_name, description, hourly_rate, email, areas]):
+    if not all([first_name, last_name, description, hourly_rate, areas]):
         return ApiResponse.get_error_response(
-            "Please provide all required fields: first_name, last_name, description, hourly_rate, email, areas",
+            "Please provide all required fields: first_name, last_name, description, hourly_rate, areas",
             http.HTTPStatus.BAD_REQUEST
         )
 
+    email = get_jwt_identity()
     coach = Coach.query.filter_by(email=email).first()
     if coach is not None:
         return ApiResponse.get_error_response(
@@ -79,39 +81,26 @@ def create_coach():
 
 
 @routes.route("/requests", methods=["GET"])
+@jwt_required(optional=True)
 def get_requests():
-    coach_id = request.args.get("coach_id")
-    if coach_id is None:
-        requests = Request.query.all()
+    coach_email = get_jwt_identity()
+    if coach_email is None:
+        requests = []
     else:
-        requests = Request.query.filter_by(coach_id=coach_id).all()
+        coach = Coach.query.filter_by(email=coach_email).first()
+        if coach is None:
+            requests = []
+        else:
+            requests = Request.query.filter_by(coach_id=coach.id).all()
 
     json_requests = list(map(lambda contact_request: contact_request.to_json(), requests))
     return ApiResponse.get_response(json_requests, http.HTTPStatus.OK)
 
 
-@routes.route("/requests/<request_id>", methods=["GET"])
-def get_request(request_id):
-    try:
-        request_id = int(request_id)
-    except ValueError:
-        return ApiResponse.get_error_response("Invalid ID", http.HTTPStatus.BAD_REQUEST)
-
-    contact_request = Request.query.filter_by(id=request_id).first()
-    if contact_request is None:
-        return ApiResponse.get_error_response(
-            f"There are no requests with id {request_id}",
-            http.HTTPStatus.NOT_FOUND
-        )
-
-    json_request = contact_request.to_json()
-    return ApiResponse.get_response(json_request, http.HTTPStatus.OK)
-
-
 @routes.route("/requests", methods=["POST"])
+@jwt_required()
 def create_request():
     coach_id = request.json.get("coach_id")
-    user_email = request.json.get("user_email")
     message = request.json.get("message")
 
     try:
@@ -122,9 +111,9 @@ def create_request():
             http.HTTPStatus.BAD_REQUEST
         )
 
-    if not all([coach_id, user_email, message]):
+    if not all([coach_id, message]):
         return ApiResponse.get_error_response(
-            "Please provide all required fields: coach_id, user_email, message",
+            "Please provide all required fields: coach_id, message",
             http.HTTPStatus.BAD_REQUEST
         )
 
@@ -137,7 +126,7 @@ def create_request():
 
     new_request = Request(
         coach_id=coach_id,
-        user_email=user_email,
+        user_email=get_jwt_identity(),
         message=message
     )
     try:

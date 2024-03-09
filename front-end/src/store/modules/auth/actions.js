@@ -18,9 +18,10 @@ export default {
 		
 		if ('data' in responseData) {
 			context.commit('setUser', {
-				userId: responseData['data'].id,
-				token: responseData['data'].access_token,
-				tokenExpiration: responseData['data'].expiration_time
+				userId: responseData['data'].user_id,
+				accessToken: responseData['data'].access_token,
+				refreshToken: responseData['data'].refresh_token,
+				tokenExpiration: responseData['data'].token_expiration
 			});
 		}
 	},
@@ -39,14 +40,6 @@ export default {
 		
 		if (!response.ok) {
 			throw new Error(responseData['error'] || 'Failed to signup!');
-		}
-		
-		if ('data' in responseData) {
-			context.commit('setUser', {
-				userId: responseData['data'].id,
-				token: responseData['data'].access_token,
-				tokenExpiration: responseData['data'].expiration_time
-			});
 		}
 	}
 };

@@ -51,11 +51,7 @@ def signup():
     except Exception as e:
         return ApiResponse.get_error_response(str(e), http.HTTPStatus.INTERNAL_SERVER_ERROR)
 
-    response = new_user.to_json()
-    response["access_token"] = create_access_token(identity=new_user.email)
-    response["expiration_time"] = _get_access_token_expiration()
-
-    return ApiResponse.get_response(response, http.HTTPStatus.CREATED)
+    return ApiResponse.get_response(new_user.to_json(), http.HTTPStatus.CREATED)
 
 
 @auth.route("/login", methods=["POST"])
@@ -81,13 +77,10 @@ def login():
 
     return ApiResponse.get_response(
         {
+            "user_id": user.id,
             "access_token": access_token,
             "refresh_token": refresh_token,
-            "expiration_time": _get_access_token_expiration()
+            "token_expiration": (datetime.now() + app.config["JWT_ACCESS_TOKEN_EXPIRES"]).strftime("%Y-%m-%d %H:%M:%S")
         },
         http.HTTPStatus.OK
     )
-
-
-def _get_access_token_expiration():
-    return (datetime.now() + app.config["JWT_ACCESS_TOKEN_EXPIRES"]).strftime("%Y-%m-%d %H:%M:%S")

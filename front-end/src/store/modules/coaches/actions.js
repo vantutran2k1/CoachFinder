@@ -5,14 +5,14 @@ export default {
 			last_name: data.last,
 			description: data.desc,
 			hourly_rate: data.rate,
-			email: data.email,
 			areas: data.areas
 		};
 		
 		await fetch('http://127.0.0.1:5000/coaches', {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${context.rootGetters.accessToken}`
 			},
 			body: JSON.stringify(coachData)
 		});
