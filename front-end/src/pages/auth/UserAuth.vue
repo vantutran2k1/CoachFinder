@@ -79,7 +79,9 @@ export default {
       try {
         if (this.mode === LOGIN) {
           await this.$store.dispatch('auth/login', actionPayload);
-          this.$router.replace('/coaches');
+
+          const redirectUrl = '/' + (this.$route.query.redirect || 'coaches');
+          this.$router.replace(redirectUrl);
         } else {
           await this.$store.dispatch('auth/signup', actionPayload);
         }
