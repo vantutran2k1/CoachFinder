@@ -79,13 +79,14 @@ export default {
       try {
         if (this.mode === LOGIN) {
           await this.$store.dispatch('auth/login', actionPayload);
+          this.$router.replace('/coaches');
         } else {
           await this.$store.dispatch('auth/signup', actionPayload);
         }
       } catch (err) {
         this.error = err.message || 'Failed to authenticate, try later!';
       }
-      
+
       this.isLoading = false;
     },
     switchAuthMode() {
