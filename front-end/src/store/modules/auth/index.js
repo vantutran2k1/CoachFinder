@@ -10,7 +10,7 @@ export default {
 			email: null,
 			accessToken: null,
 			refreshToken: null,
-			tokenExpiration: null
+			didAutoLogout: false
 		};
 	},
 	mutations,

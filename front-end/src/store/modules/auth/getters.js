@@ -13,5 +13,8 @@ export default {
 	},
 	isAuthenticated(state) {
 		return !!state.accessToken;
+	},
+	didAutoLogout(state) {
+		return state.didAutoLogout;
 	}
 };

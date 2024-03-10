@@ -1,3 +1,5 @@
+let timer;
+
 export default {
 	async login(context, payload) {
 		const response = await fetch('http://127.0.0.1:5000/auth/login', {
@@ -19,18 +21,24 @@ export default {
 		if ('data' in responseData) {
 			const data = responseData['data'];
 			
+			const expiresIn = +data.token_expiration * 1000;
+			const expirationDate = new Date().getTime() + expiresIn;
+			
 			localStorage.setItem('userId', data.user_id);
 			localStorage.setItem('email', data.email);
 			localStorage.setItem('accessToken', data.access_token);
 			localStorage.setItem('refreshToken', data.refresh_token);
-			localStorage.setItem('tokenExpiration', data.token_expiration);
+			localStorage.setItem('tokenExpiration', expirationDate);
+			
+			timer = setTimeout(function () {
+				context.dispatch('autoLogout');
+			}, expiresIn);
 			
 			context.commit('setUser', {
 				userId: data.user_id,
 				email: data.email,
 				accessToken: data.access_token,
 				refreshToken: data.refresh_token,
-				tokenExpiration: data.token_expiration
 			});
 		}
 	},
@@ -41,13 +49,21 @@ export default {
 		const refreshToken = localStorage.getItem('refreshToken');
 		const tokenExpiration = localStorage.getItem('tokenExpiration');
 		
-		if (userId && email && accessToken && refreshToken && tokenExpiration) {
+		const expiresIn = +tokenExpiration - new Date().getTime();
+		if (expiresIn < 0) {
+			return;
+		}
+		
+		timer = setTimeout(function () {
+			context.dispatch('autoLogout');
+		}, expiresIn);
+		
+		if (userId && email && accessToken && refreshToken) {
 			context.commit('setUser', {
 				userId: userId,
 				email: email,
 				accessToken: accessToken,
 				refreshToken: refreshToken,
-				tokenExpiration: tokenExpiration
 			});
 		}
 	},
@@ -84,11 +100,22 @@ export default {
 		if ('data' in responseData) {
 			context.commit('setUser', {
 				accessToken: responseData['data'].access_token,
-				tokenExpiration: responseData['data'].token_expiration
 			});
 		}
 	},
 	logout(context) {
+		localStorage.removeItem('userId');
+		localStorage.removeItem('email');
+		localStorage.removeItem('accessToken');
+		localStorage.removeItem('refreshToken');
+		localStorage.removeItem('tokenExpiration');
+		
+		clearTimeout(timer);
+		
 		context.commit('logoutUser');
+	},
+	autoLogout(context) {
+		context.dispatch('logout');
+		context.commit('setAutoLogout');
 	}
 };
