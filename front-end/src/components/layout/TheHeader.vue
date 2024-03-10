@@ -8,13 +8,29 @@
         <li>
           <router-link to="/coaches">All Coaches</router-link>
         </li>
-        <li>
+        <li v-if="isLoggedIn && isCoach">
           <router-link to="/requests">Requests</router-link>
+        </li>
+        <li v-if="!isLoggedIn">
+          <router-link to="/auth">Login</router-link>
         </li>
       </ul>
     </nav>
   </header>
 </template>
+
+<script>
+export default {
+  computed: {
+    isLoggedIn() {
+      return this.$store.getters['auth/isAuthenticated'];
+    },
+    isCoach() {
+      return this.$store.getters['coaches/isCoach'];
+    },
+  }
+};
+</script>
 
 <style scoped>
 header {

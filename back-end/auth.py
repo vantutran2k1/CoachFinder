@@ -78,6 +78,7 @@ def login():
     return ApiResponse.get_response(
         {
             "user_id": user.id,
+            "email": user.email,
             "access_token": access_token,
             "refresh_token": refresh_token,
             "token_expiration": _get_token_expiration_time()

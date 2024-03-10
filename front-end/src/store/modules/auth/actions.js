@@ -19,6 +19,7 @@ export default {
 		if ('data' in responseData) {
 			context.commit('setUser', {
 				userId: responseData['data'].user_id,
+				email: responseData['data'].email,
 				accessToken: responseData['data'].access_token,
 				refreshToken: responseData['data'].refresh_token,
 				tokenExpiration: responseData['data'].token_expiration

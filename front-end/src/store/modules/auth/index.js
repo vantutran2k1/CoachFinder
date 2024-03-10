@@ -7,6 +7,7 @@ export default {
 	state() {
 		return {
 			userId: null,
+			email: null,
 			accessToken: null,
 			refreshToken: null,
 			tokenExpiration: null
