@@ -62,5 +62,8 @@ export default {
 				tokenExpiration: responseData['data'].token_expiration
 			});
 		}
+	},
+	logout(context) {
+		context.commit('logoutUser');
 	}
 };
