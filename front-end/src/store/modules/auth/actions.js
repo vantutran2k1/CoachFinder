@@ -17,12 +17,37 @@ export default {
 		}
 		
 		if ('data' in responseData) {
+			const data = responseData['data'];
+			
+			localStorage.setItem('userId', data.user_id);
+			localStorage.setItem('email', data.email);
+			localStorage.setItem('accessToken', data.access_token);
+			localStorage.setItem('refreshToken', data.refresh_token);
+			localStorage.setItem('tokenExpiration', data.token_expiration);
+			
 			context.commit('setUser', {
-				userId: responseData['data'].user_id,
-				email: responseData['data'].email,
-				accessToken: responseData['data'].access_token,
-				refreshToken: responseData['data'].refresh_token,
-				tokenExpiration: responseData['data'].token_expiration
+				userId: data.user_id,
+				email: data.email,
+				accessToken: data.access_token,
+				refreshToken: data.refresh_token,
+				tokenExpiration: data.token_expiration
+			});
+		}
+	},
+	tryLogin(context) {
+		const userId = localStorage.getItem('userId');
+		const email = localStorage.getItem('email');
+		const accessToken = localStorage.getItem('accessToken');
+		const refreshToken = localStorage.getItem('refreshToken');
+		const tokenExpiration = localStorage.getItem('tokenExpiration');
+		
+		if (userId && email && accessToken && refreshToken && tokenExpiration) {
+			context.commit('setUser', {
+				userId: userId,
+				email: email,
+				accessToken: accessToken,
+				refreshToken: refreshToken,
+				tokenExpiration: tokenExpiration
 			});
 		}
 	},
