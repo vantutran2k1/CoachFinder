@@ -1,25 +1,32 @@
 <template>
-  <form @submit.prevent="submitForm">
-    <div class="form-control">
-      <label for="message">Message</label>
-      <textarea rows="5" id="message" v-model.trim="message"></textarea>
-    </div>
-    <p class="errors" v-if="!formIsValid">Please enter a valid email and non-empty message</p>
-    <div class="actions">
-      <base-button>Send Message</base-button>
-    </div>
-  </form>
+  <div>
+    <base-dialog :show="!!error" title="An error occurred" @close="handleError">
+      <p>{{ error }}</p>
+    </base-dialog>
+    <form @submit.prevent="submitForm">
+      <div class="form-control">
+        <label for="message">Message</label>
+        <textarea rows="5" id="message" v-model.trim="message"></textarea>
+      </div>
+      <p class="errors" v-if="!formIsValid">Please enter a valid email and non-empty message</p>
+      <div class="actions">
+        <base-button>Send Message</base-button>
+      </div>
+    </form>
+  </div>
 </template>
 
 <script>
 import BaseButton from '@/components/ui/BaseButton.vue';
+import BaseDialog from '@/components/ui/BaseDialog.vue';
 
 export default {
-  components: {BaseButton},
+  components: {BaseDialog, BaseButton},
   data() {
     return {
       message: '',
-      formIsValid: true
+      formIsValid: true,
+      error: null
     };
   },
   methods: {
@@ -30,13 +37,19 @@ export default {
         this.formIsValid = false;
         return;
       }
-
-      this.$store.dispatch('requests/contactCoach', {
-        coachId: this.$route.params.id,
-        message: this.message,
-      });
+      try {
+        this.$store.dispatch('requests/contactCoach', {
+          coachId: this.$route.params.id,
+          message: this.message,
+        });
+      } catch (err) {
+        this.error = err.message || 'Failed to contact coach!';
+      }
 
       this.$router.replace('/coaches');
+    },
+    handleError() {
+      this.error = null;
     }
   }
 };

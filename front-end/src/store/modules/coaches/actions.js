@@ -8,14 +8,22 @@ export default {
 			areas: data.areas
 		};
 		
-		await fetch('http://127.0.0.1:5000/coaches', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${context.rootGetters.accessToken}`
-			},
-			body: JSON.stringify(coachData)
-		});
+		let response = await context.dispatch('sendRegisterCoachRequest', coachData);
+		let responseData = await response.json();
+		if (!response.ok) {
+			if (response.status === 401) {
+				await context.dispatch('auth/refreshToken', null, {root: true});
+				
+				response = await context.dispatch('sendRegisterCoachRequest', coachData);
+				const retryResponseData = await response.json();
+				responseData = retryResponseData;
+				if (!response.ok) {
+					throw new Error(retryResponseData['error'] || 'Failed to send request!');
+				}
+			} else {
+				throw new Error(responseData['error'] || 'Failed to send request!');
+			}
+		}
 	},
 	async loadCoaches(context, payload) {
 		if (!payload.forceRefresh && !context.getters.shouldUpdate) {
@@ -49,5 +57,15 @@ export default {
 		
 		context.commit('setCoaches', coaches);
 		context.commit('setFetchTimestamp');
+	},
+	async sendRegisterCoachRequest(context, requestPayload) {
+		return await fetch('http://127.0.0.1:5000/coaches', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${context.rootGetters['auth/accessToken']}`
+			},
+			body: JSON.stringify(requestPayload)
+		});
 	}
 };

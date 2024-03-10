@@ -81,17 +81,13 @@ def create_coach():
 
 
 @routes.route("/requests", methods=["GET"])
-@jwt_required(optional=True)
+@jwt_required()
 def get_requests():
-    coach_email = get_jwt_identity()
-    if coach_email is None:
+    coach = Coach.query.filter_by(email=get_jwt_identity()).first()
+    if coach is None:
         requests = []
     else:
-        coach = Coach.query.filter_by(email=coach_email).first()
-        if coach is None:
-            requests = []
-        else:
-            requests = Request.query.filter_by(coach_id=coach.id).all()
+        requests = Request.query.filter_by(coach_id=coach.id).all()
 
     json_requests = list(map(lambda contact_request: contact_request.to_json(), requests))
     return ApiResponse.get_response(json_requests, http.HTTPStatus.OK)

@@ -78,15 +78,14 @@ export default {
       };
       try {
         if (this.mode === LOGIN) {
-          await this.$store.dispatch('login', actionPayload);
+          await this.$store.dispatch('auth/login', actionPayload);
         } else {
-          await this.$store.dispatch('signup', actionPayload);
+          await this.$store.dispatch('auth/signup', actionPayload);
         }
       } catch (err) {
         this.error = err.message || 'Failed to authenticate, try later!';
       }
-
-
+      
       this.isLoading = false;
     },
     switchAuthMode() {

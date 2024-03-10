@@ -85,8 +85,8 @@ export default {
       this.isLoading = true;
       try {
         await this.$store.dispatch('coaches/loadCoaches', {forceRefresh: refresh});
-      } catch (error) {
-        this.error = error.message || 'Something went wrong!';
+      } catch (err) {
+        this.error = err.message || 'Something went wrong!';
       }
       this.isLoading = false;
     },

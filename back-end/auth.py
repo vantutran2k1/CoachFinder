@@ -3,14 +3,14 @@ import re
 from datetime import datetime
 
 from flask import Blueprint, request
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from api_response import ApiResponse
 from config import app
 from models import User, db
 
-auth = Blueprint("auth", __name__)
+auth = Blueprint("auth", __name__, url_prefix="/auth")
 
 
 @auth.route("/signup", methods=["POST"])
@@ -80,7 +80,23 @@ def login():
             "user_id": user.id,
             "access_token": access_token,
             "refresh_token": refresh_token,
-            "token_expiration": (datetime.now() + app.config["JWT_ACCESS_TOKEN_EXPIRES"]).strftime("%Y-%m-%d %H:%M:%S")
+            "token_expiration": _get_token_expiration_time()
         },
         http.HTTPStatus.OK
     )
+
+
+@auth.route("/refresh", methods=["POST"])
+@jwt_required(refresh=True)
+def get_new_access_token():
+    return ApiResponse.get_response(
+        {
+            "access_token": create_access_token(identity=get_jwt_identity()),
+            "token_expiration": _get_token_expiration_time()
+        },
+        http.HTTPStatus.OK
+    )
+
+
+def _get_token_expiration_time():
+    return (datetime.now() + app.config["JWT_ACCESS_TOKEN_EXPIRES"]).strftime("%Y-%m-%d %H:%M:%S")
