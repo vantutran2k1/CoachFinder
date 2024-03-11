@@ -59,7 +59,7 @@ export default {
 		context.commit('setRequests', requests);
 	},
 	async sendContactCoachRequest(context, requestPayload) {
-		return await fetch('http://127.0.0.1:5000/requests', {
+		return await fetch(`${process.env.VUE_APP_BACKEND_URL}/requests`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ export default {
 		});
 	},
 	async sendFetchRequest(context) {
-		return await fetch('http://127.0.0.1:5000/requests', {
+		return await fetch(`${process.env.VUE_APP_BACKEND_URL}/requests`, {
 			headers: {
 				'Content-Type': 'application/json',
 				'Authorization': `Bearer ${context.rootGetters['auth/accessToken']}`

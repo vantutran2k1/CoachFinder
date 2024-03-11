@@ -31,8 +31,7 @@ export default {
 		}
 		
 		const coaches = [];
-		
-		const response = await fetch('http://127.0.0.1:5000/coaches');
+		const response = await fetch(`${process.env.VUE_APP_BACKEND_URL}/coaches`);
 		const responseData = await response.json();
 		
 		if (!response.ok) {
@@ -59,7 +58,7 @@ export default {
 		context.commit('setFetchTimestamp');
 	},
 	async sendRegisterCoachRequest(context, requestPayload) {
-		return await fetch('http://127.0.0.1:5000/coaches', {
+		return await fetch(`${process.env.VUE_APP_BACKEND_URL}/coaches`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

@@ -8,7 +8,6 @@ export default {
 	isCoach(state, getters, rootState, rootGetters) {
 		const coaches = getters.coaches;
 		const email = rootGetters['auth/email'];
-		console.log(email);
 		return coaches.some(coach => coach.email === email);
 	},
 	shouldUpdate(state) {

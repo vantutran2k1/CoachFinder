@@ -2,7 +2,7 @@ let timer;
 
 export default {
 	async login(context, payload) {
-		const response = await fetch('http://127.0.0.1:5000/auth/login', {
+		const response = await fetch(`${process.env.VUE_APP_BACKEND_URL}/auth/login`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -68,7 +68,7 @@ export default {
 		}
 	},
 	async signup(context, payload) {
-		const response = await fetch('http://127.0.0.1:5000/auth/signup', {
+		const response = await fetch(`${process.env.VUE_APP_BACKEND_URL}/auth/signup`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -85,7 +85,7 @@ export default {
 		}
 	},
 	async refreshToken(context) {
-		const response = await fetch('http://127.0.0.1:5000/auth/refresh', {
+		const response = await fetch(`${process.env.VUE_APP_BACKEND_URL}/auth/refresh`, {
 			method: 'POST',
 			headers: {
 				'Authorization': `Bearer ${context.getters.refreshToken}`
